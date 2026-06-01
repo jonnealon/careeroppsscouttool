@@ -1,0 +1,32 @@
+name: ISI Opportunity Scout
+
+on:
+  schedule:
+    # Every Monday at 8:00 AM ET (13:00 UTC)
+    - cron: "0 13 * * 1"
+  workflow_dispatch:   # allows manual trigger from GitHub UI
+
+jobs:
+  scout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install anthropic
+
+      - name: Run opportunity scout
+        env:
+          ANTHROPIC_API_KEY:   ${{ secrets.ANTHROPIC_API_KEY }}
+          GMAIL_SENDER_EMAIL:  ${{ secrets.GMAIL_SENDER_EMAIL }}
+          GMAIL_APP_PASSWORD:  ${{ secrets.GMAIL_APP_PASSWORD }}
+          RECIPIENT_EMAIL:     ${{ secrets.RECIPIENT_EMAIL }}
+        run: python opportunity_scout/scout.py
